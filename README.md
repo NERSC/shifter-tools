@@ -5,8 +5,9 @@ A collection of scripts for Shifter @ NERSC
 
 Use this script to copy linked libraries into VTune results directory.
 
-- VTune results directory: `vtune-concurrency-run0001`
-- Profiled command: `myexe` within Shifter
+- VTune results directory: `vtune-run0001`
+- Profiled command: `/usr/local/bin/myexe` within Shifter container
+- Assumes `./copy-shifter-libs.py` is in CWD
 
 ```bash
 #!/bin/bash
@@ -18,14 +19,20 @@ Use this script to copy linked libraries into VTune results directory.
 # ... additional sbatch parameters ...
 
 module load vtune
+
 PID_FILE=$(mktemp pid.XXXXXXX)
-VTUNE_DIR=$(mktemp -d vtune-collect-XXXXXX)
+VTUNE_DIR=${PWD}/vtune-run0001
+
+# run command in shifter, submit to background
 shifter /usr/local/bin/myexe & echo $! &> ${PID_FILE}
-TARGET_PID=$(cat ${PID_FILE})
+
 # attach VTune to process, defer finalization
-amplxe-cl -collect <collection-mode> -finalization-mode deferred -r ${VTUNE_DIR} --target-pid=${TARGET_PID} ...
+amplxe-cl -collect <collection-mode> -finalization-mode deferred -r ${VTUNE_DIR} --target-pid=$(cat ${PID_FILE}) ...
+
 # use script to copy libraries linked to myexe into ${VTUNE_DIR}
 shifter ./copy-shifter-libs.py -d ${VTUNE_DIR} -f /usr/local/bin/myexe
+
+# then, finalize on a login node
 ```
 
 ### Usage
@@ -41,7 +48,7 @@ optional arguments:
                         Get linked targets for this list of files
   -d DESTINATION, --destination DESTINATION
                         Destination directory (default:
-                        '/Users/jrmadsen/devel/python/shifter-tools')
+                        '${PWD}')
   -r, --recursive       Recursive ldd/otool resolution
   --max-depth MAX_DEPTH
                         Max recursive depth (default: 0 == unlimited)
