@@ -57,3 +57,67 @@ optional arguments:
                         're.search(<str>, <path>)' (default: []), e.g.
                         '^/usr/lib[6]?[4]?/lib.*\.so\.[0-9]$'
 ```
+
+### Example
+
+```bash
+$ ./copy-shifter-libs.py -r -d example -f $(which python)
+
+Libraries copied to example:
+    /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
+    /opt/local/Library/Frameworks/Python.framework/Versions/3.6/Python
+    /opt/local/lib/libiconv.2.dylib
+    /opt/local/lib/libintl.8.dylib
+    /usr/lib/closure/libclosured.dylib
+    /usr/lib/libDiagnosticMessagesClient.dylib
+    /usr/lib/libSystem.B.dylib
+    /usr/lib/libc++.1.dylib
+    /usr/lib/libc++abi.dylib
+    /usr/lib/libicucore.A.dylib
+    /usr/lib/libobjc.A.dylib
+    /usr/lib/libz.1.dylib
+    /usr/lib/system/libcache.dylib
+    /usr/lib/system/libcommonCrypto.dylib
+    /usr/lib/system/libcompiler_rt.dylib
+    /usr/lib/system/libcopyfile.dylib
+    /usr/lib/system/libcorecrypto.dylib
+    /usr/lib/system/libdispatch.dylib
+    /usr/lib/system/libdyld.dylib
+    /usr/lib/system/libkeymgr.dylib
+    /usr/lib/system/liblaunch.dylib
+    /usr/lib/system/libmacho.dylib
+    /usr/lib/system/libquarantine.dylib
+    /usr/lib/system/libremovefile.dylib
+    /usr/lib/system/libsystem_asl.dylib
+    /usr/lib/system/libsystem_blocks.dylib
+    /usr/lib/system/libsystem_c.dylib
+    /usr/lib/system/libsystem_configuration.dylib
+    /usr/lib/system/libsystem_coreservices.dylib
+    /usr/lib/system/libsystem_darwin.dylib
+    /usr/lib/system/libsystem_dnssd.dylib
+    /usr/lib/system/libsystem_info.dylib
+    /usr/lib/system/libsystem_kernel.dylib
+    /usr/lib/system/libsystem_m.dylib
+    /usr/lib/system/libsystem_malloc.dylib
+    /usr/lib/system/libsystem_network.dylib
+    /usr/lib/system/libsystem_networkextension.dylib
+    /usr/lib/system/libsystem_notify.dylib
+    /usr/lib/system/libsystem_platform.dylib
+    /usr/lib/system/libsystem_pthread.dylib
+    /usr/lib/system/libsystem_sandbox.dylib
+    /usr/lib/system/libsystem_secinit.dylib
+    /usr/lib/system/libsystem_symptoms.dylib
+    /usr/lib/system/libsystem_trace.dylib
+    /usr/lib/system/libunwind.dylib
+    /usr/lib/system/libxpc.dylib
+
+$ ls example/
+CoreFoundation*                    libcommonCrypto.dylib*             libintl.8.dylib                    libsystem_blocks.dylib*            libsystem_m.dylib*                 libsystem_secinit.dylib*
+Python*                            libcompiler_rt.dylib*              libkeymgr.dylib*                   libsystem_c.dylib*                 libsystem_malloc.dylib*            libsystem_symptoms.dylib*
+libDiagnosticMessagesClient.dylib* libcopyfile.dylib*                 liblaunch.dylib*                   libsystem_configuration.dylib*     libsystem_network.dylib*           libsystem_trace.dylib*
+libSystem.B.dylib*                 libcorecrypto.dylib*               libmacho.dylib*                    libsystem_coreservices.dylib*      libsystem_networkextension.dylib*  libunwind.dylib*
+libc++.1.dylib*                    libdispatch.dylib*                 libobjc.A.dylib*                   libsystem_darwin.dylib*            libsystem_notify.dylib*            libxpc.dylib*
+libc++abi.dylib*                   libdyld.dylib*                     libquarantine.dylib*               libsystem_dnssd.dylib*             libsystem_platform.dylib*          libz.1.dylib*
+libcache.dylib*                    libiconv.2.dylib*                  libremovefile.dylib*               libsystem_info.dylib*              libsystem_pthread.dylib*
+libclosured.dylib*                 libicucore.A.dylib*                libsystem_asl.dylib*               libsystem_kernel.dylib*            libsystem_sandbox.dylib*
+```
