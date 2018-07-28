@@ -3,7 +3,12 @@ A collection of scripts for Shifter @ NERSC
 
 ## copy-shifter-libs.py
 
-Use this script to copy linked libraries into VTune results directory.
+This script takes one or more files (-f flag), determines the libraries that are linked to 
+the file, and copies those libraries into a specified directory (-d flag).
+This directory should be the VTune results directory. By copying the libraries
+into this directory, VTune can finalize the results outside of a Shifter container.
+If the recursive flag (-r) is provided, this script will find and copy the 
+implicitly linked libraries.
 
 - VTune results directory: `vtune-run0001`
 - Profiled command: `/usr/local/bin/myexe` within Shifter container
