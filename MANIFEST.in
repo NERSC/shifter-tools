@@ -1,0 +1,12 @@
+# direct includes
+include VERSION
+include LICENSE
+include README.md
+include setup.py
+include setup.cfg
+include shiftercp.py
+
+# global exclude
+global-exclude *.pyc
+global-exclude *.git*
+global-exclude *__pycache__*

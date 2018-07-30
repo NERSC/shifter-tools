@@ -1,18 +1,52 @@
 # shifter-tools
 A collection of scripts for Shifter @ NERSC
 
-## copy-shifter-libs.py
+## shiftercp
 
-This script takes one or more files (-f flag), determines the libraries that are linked to 
-the file, and copies those libraries into a specified directory (-d flag).
+This script takes one or more executables or libraries (-f flag), determines the libraries
+ that are linked to the file, and copies those libraries into a specified directory (-d flag).
 This directory should be the VTune results directory. By copying the libraries
 into this directory, VTune can finalize the results outside of a Shifter container.
-If the recursive flag (-r) is provided, this script will find and copy the 
+If the recursive flag (-r) is provided, this script will find and copy the
 implicitly linked libraries.
+
+### Usage Flags
+
+- `-f` : executable or file (required)
+    - Accepts 1 or more arguments
+- `-d` : output directory (optional)
+    - Accepts only one arguments
+    - Default: current working directory
+- `-r` : enable recursion (optional)
+    - Optional
+    - Accepts zero arguments
+    - Enables copying of implicitly linked libraries
+    - `myexe` links to libfoo.so
+    - libfoo.so links to libbar.so
+    - Within recursion enabled, `shiftercp.py` will copy libbar.so into the output directory
+- `--max-depth=<N>` : limits the depth of recursion (optional)
+    - Accepts one integer argument
+    - Default: `0`
+    - `N == 0` means unlimited, all implicitly linked libraries will be found and copied
+    - Only used in conjunction with `-r` flag
+    - Example:
+        - `myexe` links to libfoo.so
+        - libfoo.so links to libbar.so (level 1)
+        - libbar.so links to librt.so (level 2)
+        - librt.so links to libdc.so (level 3)
+        - if `N == 0`, all above libraries will be copied to output directory
+        - if `N == 1`, libfoo.so and libbar.so will be copied to output directory
+        - if `N == 2`, libfoo.so, libbar.so, and librt.so will be copied to output directory
+- `-e` : regex string (optional)
+    - Accepts one or more strings
+    - See [Python re documentation](https://docs.python.org/3/library/re.html) for Regex information
+    - Uses `re.search(..., <library-name>)`
+
+### SLURM Example
 
 - VTune results directory: `vtune-run0001`
 - Profiled command: `/usr/local/bin/myexe` within Shifter container
-- Assumes `./copy-shifter-libs.py` is in CWD
+- Assumes `./shiftercp.py` is in CWD
 
 ```bash
 #!/bin/bash
@@ -35,7 +69,7 @@ shifter /usr/local/bin/myexe & echo $! &> ${PID_FILE}
 amplxe-cl -collect <collection-mode> -finalization-mode deferred -r ${VTUNE_DIR} --target-pid=$(cat ${PID_FILE}) ...
 
 # use script to copy libraries linked to myexe into ${VTUNE_DIR}
-shifter ./copy-shifter-libs.py -d ${VTUNE_DIR} -f /usr/local/bin/myexe
+shifter ./shiftercp.py -d ${VTUNE_DIR} -f /usr/local/bin/myexe
 
 # then, finalize on a login node
 ```
@@ -43,7 +77,7 @@ shifter ./copy-shifter-libs.py -d ${VTUNE_DIR} -f /usr/local/bin/myexe
 ### Usage
 
 ```bash
-usage: copy-shifter-libs.py [-h] [-f [FILES [FILES ...]]] [-d DESTINATION]
+usage: shiftercp.py [-h] [-f [FILES [FILES ...]]] [-d DESTINATION]
                             [-r] [--max-depth MAX_DEPTH]
                             [-e [EXCLUDE [EXCLUDE ...]]]
 
@@ -66,7 +100,7 @@ optional arguments:
 ### Example
 
 ```bash
-$ ./copy-shifter-libs.py -r -d example -f $(which python)
+$ ./shiftercp.py -r -d example -f $(which python)
 
 Libraries copied to example:
     /System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation
@@ -117,12 +151,20 @@ Libraries copied to example:
     /usr/lib/system/libxpc.dylib
 
 $ ls example/
-CoreFoundation*                    libcommonCrypto.dylib*             libintl.8.dylib                    libsystem_blocks.dylib*            libsystem_m.dylib*                 libsystem_secinit.dylib*
-Python*                            libcompiler_rt.dylib*              libkeymgr.dylib*                   libsystem_c.dylib*                 libsystem_malloc.dylib*            libsystem_symptoms.dylib*
-libDiagnosticMessagesClient.dylib* libcopyfile.dylib*                 liblaunch.dylib*                   libsystem_configuration.dylib*     libsystem_network.dylib*           libsystem_trace.dylib*
-libSystem.B.dylib*                 libcorecrypto.dylib*               libmacho.dylib*                    libsystem_coreservices.dylib*      libsystem_networkextension.dylib*  libunwind.dylib*
-libc++.1.dylib*                    libdispatch.dylib*                 libobjc.A.dylib*                   libsystem_darwin.dylib*            libsystem_notify.dylib*            libxpc.dylib*
-libc++abi.dylib*                   libdyld.dylib*                     libquarantine.dylib*               libsystem_dnssd.dylib*             libsystem_platform.dylib*          libz.1.dylib*
-libcache.dylib*                    libiconv.2.dylib*                  libremovefile.dylib*               libsystem_info.dylib*              libsystem_pthread.dylib*
-libclosured.dylib*                 libicucore.A.dylib*                libsystem_asl.dylib*               libsystem_kernel.dylib*            libsystem_sandbox.dylib*
+CoreFoundation                    libcommonCrypto.dylib             libintl.8.dylib
+libsystem_blocks.dylib            libsystem_m.dylib                 libsystem_secinit.dylib
+Python                            libcompiler_rt.dylib              libkeymgr.dylib
+libsystem_c.dylib                 libsystem_malloc.dylib            libsystem_symptoms.dylib
+libDiagnosticMessagesClient.dylib libcopyfile.dylib                 liblaunch.dylib
+libsystem_configuration.dylib     libsystem_network.dylib           libsystem_trace.dylib
+libSystem.B.dylib                 libcorecrypto.dylib               libmacho.dylib
+libsystem_coreservices.dylib      libsystem_networkextension.dylib  libunwind.dylib
+libc++.1.dylib                    libdispatch.dylib                 libobjc.A.dylib
+libsystem_darwin.dylib            libsystem_notify.dylib            libxpc.dylib
+libc++abi.dylib                   libdyld.dylib                     libquarantine.dylib
+libsystem_dnssd.dylib             libsystem_platform.dylib          libz.1.dylib
+libcache.dylib                    libiconv.2.dylib                  libremovefile.dylib
+libsystem_info.dylib              libsystem_pthread.dylib           libclosured.dylib
+libicucore.A.dylib                libsystem_asl.dylib               libsystem_kernel.dylib
+libsystem_sandbox.dylib
 ```
