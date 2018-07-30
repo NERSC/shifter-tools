@@ -39,6 +39,7 @@ implicitly linked libraries.
         - if `N == 2`, libfoo.so, libbar.so, and librt.so will be copied to output directory
 - `-e` : regex string (optional)
     - Accepts one or more strings
+    - Disabled copying libraries that match the regex string
     - See [Python re documentation](https://docs.python.org/3/library/re.html) for Regex information
     - Uses `re.search(..., <library-name>)`
 
