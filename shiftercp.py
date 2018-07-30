@@ -241,6 +241,11 @@ def main(args):
 
     libs, links = resolve_paths(libs, args.exclude)
 
+    if args.copy_files:
+        printlist("Files copied to {}".format(args.destination), args.files)
+        for f in args.files:
+            copyfile(f, args.destination)
+
     printlist("Libraries copied to {}".format(args.destination), libs)
 
     for lib in libs:
@@ -277,6 +282,9 @@ if __name__ == "__main__":
                         help=("List of regex expressions to exclude from copy using 're.search(<str>, <path>)' "
                               "(default: %(default)s), e.g. '^/usr/lib[6]?[4]?/lib.*\.so\.[0-9]$'"),
                         default=[])
+    parser.add_argument("--copy-files",
+                        help="Copy the executable to the output directory",
+                        action="store_true")
 
     args = parser.parse_args()
 

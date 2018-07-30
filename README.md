@@ -12,19 +12,18 @@ implicitly linked libraries.
 
 ### Usage Flags
 
-- `-f` : executable or file (required)
+- `-f` : executable or library [required]
     - Accepts 1 or more arguments
-- `-d` : output directory (optional)
+- `-d` : output directory [optional]
     - Accepts only one arguments
     - Default: current working directory
-- `-r` : enable recursion (optional)
-    - Optional
+- `-r` : enable recursion [optional]
     - Accepts zero arguments
     - Enables copying of implicitly linked libraries
     - `myexe` links to libfoo.so
     - libfoo.so links to libbar.so
     - Within recursion enabled, `shiftercp.py` will copy libbar.so into the output directory
-- `--max-depth=<N>` : limits the depth of recursion (optional)
+- `--max-depth=<N>` : limits the depth of recursion [optional]
     - Accepts one integer argument
     - Default: `0`
     - `N == 0` means unlimited, all implicitly linked libraries will be found and copied
@@ -37,11 +36,15 @@ implicitly linked libraries.
         - if `N == 0`, all above libraries will be copied to output directory
         - if `N == 1`, libfoo.so and libbar.so will be copied to output directory
         - if `N == 2`, libfoo.so, libbar.so, and librt.so will be copied to output directory
-- `-e` : regex string (optional)
+- `-e` : regex string [optional]
     - Accepts one or more strings
     - Disabled copying libraries that match the regex string
     - See [Python re documentation](https://docs.python.org/3/library/re.html) for Regex information
     - Uses `re.search(..., <library-name>)`
+- `--copy-files` : copy the list of files (e.g. `-f` parameters) to output directory [optional]
+    - Accepts zero arguments
+    - The list of files provided by `-f` flag will also be copied to output directory
+
 
 ### SLURM Example
 
