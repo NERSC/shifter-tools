@@ -216,6 +216,13 @@ def main(args):
             print("\t{}".format(x))
         print("")
     #--------------------------------------------------------------------------#
+    def printdict(title, d):
+        print("{}:".format(title))
+        for src, link in d.items():
+            print("\t{} ==> {}".format(link, src))
+        print("")
+
+    #--------------------------------------------------------------------------#
 
     depth = 0
     while True:
@@ -239,22 +246,25 @@ def main(args):
                     break
         depth += 1
 
-    libs, links = resolve_paths(libs, args.exclude)
+    def report_and_copy(_prefix, _dest, _files, _exclude = []):
+        _fnames, _links = resolve_paths(_files, _exclude)
+        # copy files
+        if len(_fnames) > 0:
+            printlist("{} copied to '{}'".format(_prefix, _dest), _fnames)
+            for f in _fnames:
+                copyfile(f, _dest)
+        # create links
+        if len(_links) > 0:
+            printdict("{} links copied to '{}'".format(_prefix, _dest), _links)
+            for lsrc, ltarget in _links.items():
+                ldst = os.path.join(_dest, ltarget)
+                if not os.path.exists(ldst):
+                    os.symlink(lsrc, ldst)
 
     if args.copy_files:
-        printlist("Files copied to {}".format(args.destination), args.files)
-        for f in args.files:
-            copyfile(f, args.destination)
+        report_and_copy("Files", args.destination, args.files, args.exclude)
 
-    printlist("Libraries copied to {}".format(args.destination), libs)
-
-    for lib in libs:
-        copyfile(lib, args.destination)
-
-    for lsrc, ltarget in links.items():
-        ldst = os.path.join(args.destination, ltarget)
-        if not os.path.exists(ldst):
-            os.symlink(lsrc, ldst)
+    report_and_copy("Libraries", args.destination, libs, args.exclude)
 
 
 #------------------------------------------------------------------------------#
